@@ -195,12 +195,64 @@ func TestBadRegex(t *testing.T) {
 	a.Nil(m)
 }
 
-func BenchmarkCore(b *testing.B) {
+func BenchmarkSmallStruct(b *testing.B) {
+	type Human struct {
+		Name string
+		Age  int
+	}
+
+	rs := &r.Restruct{
+		RegexToStructs: []*r.RegexToStruct{
+			{
+				ID:     "age",
+				Regex:  `(?P<name>\w+) is (?P<age>\d+) years old`,
+				Struct: &Human{},
+			},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		_, _ = rs.MatchString("Johh is 42 years old")
+	}
+}
+
+func BenchmarkThreeRules(b *testing.B) {
+	type Human struct {
+		Name string
+		Age  int
+	}
+
+	rs := &r.Restruct{
+		RegexToStructs: []*r.RegexToStruct{
+			{
+				ID:     "height",
+				Regex:  `^(?P<name>\w+) is (?P<height>\d+) cm tall$`,
+				Struct: &Human{},
+			},
+			{
+				ID:     "weight",
+				Regex:  `^(?P<name>\w+) weighs (?P<weight>\d+) kg$`,
+				Struct: &Human{},
+			},
+			{
+				ID:     "age",
+				Regex:  `(?P<name>\w+) is (?P<age>\d+) years old`,
+				Struct: &Human{},
+			},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		_, _ = rs.MatchString("Johh is 42 years old")
+	}
+}
+
+func BenchmarkBiggerStruct(b *testing.B) {
 	type Human struct {
 		Name   string
 		Age    int
 		Height *int
-		Male   string
+		Male   bool
 	}
 
 	rs := &r.Restruct{
