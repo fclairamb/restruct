@@ -1,0 +1,81 @@
+run:
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  deadline: 1m
+
+  # default concurrency is a available CPU number
+  concurrency: 4
+
+linters:
+  disable-all: true
+  enable:
+    - asciicheck
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - dupl
+    - errcheck
+    - exhaustive
+    # - exhaustivestruct
+    - exportloopref
+    - funlen
+    - gci
+    - gochecknoinits
+    - gochecknoglobals
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godox
+    - goerr113
+    - gofmt
+    - goimports
+    # - golint --> revive
+    - revive
+    - gomnd
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    # - interfacer --> (deprecated)
+    - lll
+    # - maligned --> govet:fieldalignment
+    - megacheck
+    - misspell
+    - nakedret
+    - nestif
+    - nlreturn
+    - prealloc
+    - nilerr
+    - nolintlint
+    - rowserrcheck
+    # - scopelint --> exportloopref
+    - exportloopref
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - testpackage
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - whitespace
+    - wrapcheck
+    - wsl
+  fast: false
+  misspell:
+    # Correct spellings using locale preferences for US or UK.
+    # Default is to use a neutral variety of English.
+    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
+    locale: US
+issues:
+  include:
+    - EXC0012 # EXC0012 revive: Annoying issue about not having a comment. The rare codebase has such comments
+    - EXC0014 # EXC0014 revive: Annoying issue about not having a comment. The rare codebase has such comments
+  exclude-rules:
+    - path: "_test\\.go"
+      linters:
+        - funlen
+        - gomnd
