@@ -157,7 +157,10 @@ func (r *RegexToStruct) fillStruct(s interface{}, match []string) (interface{}, 
 		}
 
 		if err := fillField(stValue, reValue); err != nil {
-			return nil, &FieldFillingError{FieldName: stValue.Type().Name(), Err: err}
+			return nil, &FieldFillingError{
+				FieldName: reflect.TypeOf(s).Elem().Field(fieldIndex).Name,
+				Err:       err,
+			}
 		}
 	}
 

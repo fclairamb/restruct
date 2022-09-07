@@ -99,6 +99,45 @@ func TestFillingError(t *testing.T) {
 	a.Nil(m)
 }
 
+func TestTypeIgnore(t *testing.T) {
+	a := assert.New(t)
+
+	type StA struct {
+		A int `restruct:"-"`
+		B int `restruct:"a"`
+	}
+
+	type StB struct {
+		B int `restruct:"a"`
+		A int `restruct:"-"`
+	}
+
+	rs := &r.Restruct{
+		RegexToStructs: []*r.RegexToStruct{
+			{
+				Regex:  `a:(?P<a>\d+)`,
+				Struct: &StA{},
+			},
+			{
+				Regex:  `b:(?P<a>\d+)`,
+				Struct: &StB{},
+			},
+		},
+	}
+
+	m, err := rs.MatchString("a:123")
+	a.NoError(err)
+	a.NotNil(m)
+	a.Equal(123, m.Struct.(*StA).B)
+	a.Equal(0, m.Struct.(*StA).A)
+
+	m, err = rs.MatchString("b:123")
+	a.NoError(err)
+	a.NotNil(m)
+	a.Equal(123, m.Struct.(*StB).B)
+	a.Equal(0, m.Struct.(*StB).A)
+}
+
 func TestTypeFloat(t *testing.T) {
 	a := assert.New(t)
 
@@ -213,7 +252,7 @@ func TestBadRegex(t *testing.T) {
 
 	m, err := rs.MatchString("anything")
 	a.Error(err)
-	a.ErrorContains(err, "could not compile regex:")
+	a.ErrorContains(err, "could not compile rule: error parsing regexp:")
 	a.Nil(m)
 }
 
@@ -235,7 +274,7 @@ func TestBadField(t *testing.T) {
 
 	m, err := rs.MatchString("anything")
 	a.Error(err)
-	a.ErrorContains(err, "could not fill field a: strconv.Atoi")
+	a.ErrorContains(err, "could not fill field A: strconv.Atoi")
 	a.Nil(m)
 }
 
