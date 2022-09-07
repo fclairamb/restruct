@@ -3,8 +3,7 @@
 [![Go version](https://img.shields.io/github/go-mod/go-version/fclairamb/restruct)](https://golang.org/doc/devel/release.html)
 [![Release](https://img.shields.io/github/v/release/fclairamb/restruct)](https://github.com/fclairamb/restruct/releases/latest)
 [![Build](https://github.com/fclairamb/restruct/workflows/Build/badge.svg)](https://github.com/fclairamb/restruct/actions/workflows/build.yml)
-[![codecov](https://codecov.io/gh/fclairamb/restruct/branch/main/graph/badge.svg?token=y1vcrxbXfv)](https://codecov.io/gh/fclairamb/restruct)
-[![gocover.io](https://gocover.io/_badge/github.com/fclairamb/restruct)](https://gocover.io/github.com/fclairamb/restruct)
+[![codecov](https://codecov.io/gh/fclairamb/restruct/branch/main/graph/badge.svg?token=y1vcrxbXfv)](https://codecov.io/gh/fclairamb/restruct)<!--- [![gocover.io](https://gocover.io/_badge/github.com/fclairamb/restruct)](https://gocover.io/github.com/fclairamb/restruct) -->
 [![Go Report Card](https://goreportcard.com/badge/fclairamb/restruct)](https://goreportcard.com/report/fclairamb/restruct)
 [![GoDoc](https://godoc.org/github.com/fclairamb/restruct?status.svg)](https://godoc.org/github.com/fclairamb/restruct)
 
