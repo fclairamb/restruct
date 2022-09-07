@@ -47,7 +47,8 @@ jobs:
         #   CGO_ENABLED: 0
         run: |
           apt-get update && apt-get install gcc -y
-          go test -parallel 20 -v -race -coverprofile=coverage.txt -covermode=atomic ./... -bench=. -benchmem
+          go test -parallel 20 -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+          go test ./... -run=^$ -bench=. -benchmem
           bash <(curl -s https://codecov.io/bash)
   # For github to have a unique status check name
   build-status:
