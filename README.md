@@ -1,4 +1,4 @@
-# Regex to struct
+# Regex to struct library
 
 [![Go version](https://img.shields.io/github/go-mod/go-version/fclairamb/restruct)](https://golang.org/doc/devel/release.html)
 [![Release](https://img.shields.io/github/v/release/fclairamb/restruct)](https://github.com/fclairamb/restruct/releases/latest)
@@ -12,7 +12,7 @@
 This is a very simple library that allows you to convert a regex into a struct. It's intended to be used for simple text parsing around 
 dummy bots.
 
-The struct will have a field for each capture group in the regex.
+The struct shall have a field for each capture group of the regex.
 
 ## Usage
 
