@@ -213,7 +213,7 @@ func TestBadRegex(t *testing.T) {
 
 	m, err := rs.MatchString("anything")
 	a.Error(err)
-	a.ErrorContains(err, "error parsing regexp")
+	a.ErrorContains(err, "could not compile regex:")
 	a.Nil(m)
 }
 
