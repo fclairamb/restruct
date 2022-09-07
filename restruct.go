@@ -16,10 +16,59 @@ const (
 
 // RegexToStruct defines the link between the regex and the struct
 type RegexToStruct struct {
-	ID            string      // ID of the match (optional)
-	Regex         string      // Regex to match (before compilation)
-	Struct        interface{} // Struct instance to fill (can be shared between multiple RegexToStruct)
-	compiledRegex *regexp.Regexp
+	ID            string         // ID of the match (optional)
+	Regex         string         // Regex to match (before compilation)
+	Struct        interface{}    // Struct instance to fill (can be shared between multiple RegexToStruct)
+	compiledRegex *regexp.Regexp // Compiled regex
+	subexToField  map[int]int    // Map of subexpression index to field index
+}
+
+func (r *RegexToStruct) compile() error {
+	compiledRegex, err := regexp.Compile(r.Regex)
+	if err != nil {
+		return &CompilationError{Err: err, ID: r.ID}
+	}
+
+	r.compiledRegex = compiledRegex
+
+	r.subexToField = make(map[int]int)
+
+	reNameToID := make(map[string]int)
+
+	for i, name := range r.compiledRegex.SubexpNames() {
+		if name == "" {
+			continue
+		}
+
+		reNameToID[name] = i
+	}
+
+	typeT := reflect.TypeOf(r.Struct)
+
+	if typeT.Kind() == reflect.Ptr {
+		typeT = typeT.Elem()
+	}
+
+	nbFields := typeT.NumField()
+	for i := 0; i < nbFields; i++ {
+		var tagValue string
+		{
+			field := typeT.Field(i)
+			tagValue = field.Tag.Get("restruct")
+
+			if tagValue == "" {
+				tagValue = strings.ToLower(field.Name)
+			} else if tagValue == "-" {
+				continue
+			}
+		}
+
+		if reID, ok := reNameToID[tagValue]; ok {
+			r.subexToField[reID] = i
+		}
+	}
+
+	return nil
 }
 
 // Restruct is the core type
@@ -41,21 +90,19 @@ func (e *FieldFillingError) Error() string {
 // CompilationError is an error that occurs when compiling rules
 type CompilationError struct {
 	Err error
+	ID  string
 }
 
 func (e *CompilationError) Error() string {
-	return fmt.Sprintf("could not compile regex: %s", e.Err)
+	return fmt.Sprintf("could not compile rule: %s", e.Err)
 }
 
 // compile compiles the regexes
 func (r *Restruct) compile() error {
-	for i, regexToStruct := range r.RegexToStructs {
-		compiledRegex, err := regexp.Compile(regexToStruct.Regex)
-		if err != nil {
-			return &CompilationError{Err: err}
+	for _, regexToStruct := range r.RegexToStructs {
+		if err := regexToStruct.compile(); err != nil {
+			return err
 		}
-
-		r.RegexToStructs[i].compiledRegex = compiledRegex
 	}
 
 	r.compiled = true
@@ -91,37 +138,17 @@ func (r *Restruct) matchRegexString(rs *RegexToStruct, str string) (interface{},
 		return nil, nil
 	}
 
-	dict := make(map[string]string)
-
-	for i, name := range rs.compiledRegex.SubexpNames() {
-		dict[name] = match[i]
-	}
-
-	return fillStruct(rs.Struct, dict)
+	return rs.fillStruct(rs.Struct, match)
 }
 
-func fillStruct(s interface{}, dict map[string]string) (interface{}, error) {
-	typeT := reflect.TypeOf(s)
-
-	if typeT.Kind() == reflect.Ptr {
-		typeT = typeT.Elem()
-	}
-
-	nbFields := typeT.NumField()
-
-	for i := 0; i < nbFields; i++ {
-		var tagValue string
-		{
-			field := typeT.Field(i)
-			tagValue = field.Tag.Get("restruct")
-
-			if tagValue == "" {
-				tagValue = strings.ToLower(field.Name)
-			}
+func (r *RegexToStruct) fillStruct(s interface{}, match []string) (interface{}, error) {
+	for i, reValue := range match {
+		fieldIndex, ok := r.subexToField[i]
+		if !ok {
+			continue
 		}
 
-		reValue := dict[tagValue]
-		stValue := reflect.ValueOf(s).Elem().Field(i)
+		stValue := reflect.ValueOf(s).Elem().Field(fieldIndex)
 
 		if reValue == "" {
 			stValue.Set(reflect.Zero(stValue.Type()))
@@ -130,7 +157,7 @@ func fillStruct(s interface{}, dict map[string]string) (interface{}, error) {
 		}
 
 		if err := fillField(stValue, reValue); err != nil {
-			return nil, &FieldFillingError{FieldName: tagValue, Err: err}
+			return nil, &FieldFillingError{FieldName: stValue.Type().Name(), Err: err}
 		}
 	}
 
