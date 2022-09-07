@@ -1,3 +1,4 @@
 *.pprof
+coverage.txt
 __debug_bin
 *.test
