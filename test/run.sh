@@ -1,4 +1,8 @@
 #!/bin/sh -ex
+
+go test -parallel 20 -v -race -coverprofile=coverage.txt -covermode=atomic -coverpkg=../... ../...
+go tool cover -html=coverage.txt
+
 for test in BenchmarkSmallStruct BenchmarkBiggerStruct BenchmarkThreeRules
 do
   go test -bench=$test -run=^$ -cpuprofile $test.pprof -benchtime=5s

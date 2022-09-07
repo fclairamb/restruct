@@ -78,6 +78,27 @@ func TestStandard(t *testing.T) {
 	a.Nil(m)
 }
 
+func TestFillingError(t *testing.T) {
+	a := assert.New(t)
+
+	type Something struct {
+		A int
+	}
+
+	rs := &r.Restruct{
+		RegexToStructs: []*r.RegexToStruct{
+			{
+				Regex:  `(?P<a>\w+)`,
+				Struct: &Something{},
+			},
+		},
+	}
+
+	m, err := rs.MatchString("abc")
+	a.Error(err)
+	a.Nil(m)
+}
+
 func TestTypeFloat(t *testing.T) {
 	a := assert.New(t)
 
@@ -190,8 +211,31 @@ func TestBadRegex(t *testing.T) {
 		},
 	}
 
-	m, err := rs.MatchString("John is 42 years old")
+	m, err := rs.MatchString("anything")
 	a.Error(err)
+	a.ErrorContains(err, "could not compile regex:")
+	a.Nil(m)
+}
+
+func TestBadField(t *testing.T) {
+	a := assert.New(t)
+
+	type Something struct {
+		A int
+	}
+
+	rs := &r.Restruct{
+		RegexToStructs: []*r.RegexToStruct{
+			{
+				Regex:  `(?P<a>\w+)`,
+				Struct: &Something{},
+			},
+		},
+	}
+
+	m, err := rs.MatchString("anything")
+	a.Error(err)
+	a.ErrorContains(err, "could not fill field a: strconv.Atoi")
 	a.Nil(m)
 }
 
