@@ -280,6 +280,28 @@ func BenchmarkSmallStruct(b *testing.B) {
 	}
 }
 
+func BenchmarkLoadAndExec(b *testing.B) {
+	type Human struct {
+		Name string
+		Age  int
+	}
+
+	rules := []*r.RegexToStruct{
+		{
+			ID:     "age",
+			Regex:  `(?P<name>\w+) is (?P<age>\d+) years old`,
+			Struct: &Human{},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		rs := &r.Restruct{
+			RegexToStructs: rules,
+		}
+		_, _ = rs.MatchString("Johh is 42 years old")
+	}
+}
+
 func BenchmarkThreeRules(b *testing.B) {
 	type Human struct {
 		Name string
