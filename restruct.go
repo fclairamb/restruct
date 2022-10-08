@@ -151,7 +151,13 @@ func (r *RegexToStruct) fillStruct(s interface{}, match []string) (interface{}, 
 			continue
 		}
 
-		stValue := reflect.ValueOf(s).Elem().Field(fieldIndex)
+		stValue := reflect.ValueOf(s)
+
+		if stValue.Kind() != reflect.Ptr {
+			return nil, ErrStructNotAPointer
+		}
+
+		stValue = stValue.Elem().Field(fieldIndex)
 
 		if reValue == "" {
 			stValue.Set(reflect.Zero(stValue.Type()))
