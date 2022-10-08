@@ -1,4 +1,5 @@
+__*
 *.pprof
-coverage.txt
-__debug_bin
 *.test
+coverage.txt
+.DS_Store

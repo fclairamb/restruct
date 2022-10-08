@@ -256,6 +256,26 @@ func TestBadRegex(t *testing.T) {
 	a.Nil(m)
 }
 
+func TestNotAPointer(t *testing.T) {
+	a := assert.New(t)
+
+	type Something struct {
+		A string
+	}
+
+	rs := &r.Restruct{
+		RegexToStructs: []*r.RegexToStruct{
+			{
+				Regex:  `(?P<a>\w+)`,
+				Struct: Something{},
+			},
+		},
+	}
+
+	_, err := rs.MatchString("anything")
+	a.ErrorIs(err, r.ErrStructNotAPointer)
+}
+
 func TestBadField(t *testing.T) {
 	a := assert.New(t)
 
@@ -295,6 +315,28 @@ func BenchmarkSmallStruct(b *testing.B) {
 	}
 
 	for i := 0; i < b.N; i++ {
+		_, _ = rs.MatchString("Johh is 42 years old")
+	}
+}
+
+func BenchmarkLoadAndExec(b *testing.B) {
+	type Human struct {
+		Name string
+		Age  int
+	}
+
+	rules := []*r.RegexToStruct{
+		{
+			ID:     "age",
+			Regex:  `(?P<name>\w+) is (?P<age>\d+) years old`,
+			Struct: &Human{},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		rs := &r.Restruct{
+			RegexToStructs: rules,
+		}
 		_, _ = rs.MatchString("Johh is 42 years old")
 	}
 }

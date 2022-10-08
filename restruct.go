@@ -87,6 +87,9 @@ func (e *FieldFillingError) Error() string {
 	return fmt.Sprintf("could not fill field %s: %s", e.FieldName, e.Err)
 }
 
+// ErrStructNotAPointer is an error that occurs when the struct is not a pointer
+var ErrStructNotAPointer = fmt.Errorf("struct is not a pointer")
+
 // CompilationError is an error that occurs when compiling rules
 type CompilationError struct {
 	Err error
