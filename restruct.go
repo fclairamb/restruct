@@ -38,6 +38,9 @@ func (e *FieldFillingError) Error() string {
 	return fmt.Sprintf("could not fill field %s: %s", e.FieldName, e.Err)
 }
 
+// ErrStructNotAPointer is an error that occurs when the struct is not a pointer
+var ErrStructNotAPointer = fmt.Errorf("struct is not a pointer")
+
 // CompilationError is an error that occurs when compiling rules
 type CompilationError struct {
 	Err error
@@ -121,7 +124,13 @@ func fillStruct(s interface{}, dict map[string]string) (interface{}, error) {
 		}
 
 		reValue := dict[tagValue]
-		stValue := reflect.ValueOf(s).Elem().Field(i)
+		stValue := reflect.ValueOf(s)
+
+		if stValue.Kind() != reflect.Pointer {
+			return nil, ErrStructNotAPointer
+		}
+
+		stValue = stValue.Elem().Field(i)
 
 		if reValue == "" {
 			stValue.Set(reflect.Zero(stValue.Type()))

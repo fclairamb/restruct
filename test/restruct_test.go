@@ -217,6 +217,26 @@ func TestBadRegex(t *testing.T) {
 	a.Nil(m)
 }
 
+func TestNotAPointer(t *testing.T) {
+	a := assert.New(t)
+
+	type Something struct {
+		A string
+	}
+
+	rs := &r.Restruct{
+		RegexToStructs: []*r.RegexToStruct{
+			{
+				Regex:  `(?P<a>\w+)`,
+				Struct: Something{},
+			},
+		},
+	}
+
+	_, err := rs.MatchString("anything")
+	a.ErrorIs(err, r.ErrStructNotAPointer)
+}
+
 func TestBadField(t *testing.T) {
 	a := assert.New(t)
 
