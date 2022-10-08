@@ -1,2 +1,4 @@
 *.pprof
 coverage.txt
+.DS_Store
+*.test
