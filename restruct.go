@@ -50,6 +50,14 @@ func (r *RegexToStruct) compile() error {
 		typeT = typeT.Elem()
 	}
 
+	stValue := reflect.ValueOf(r.Struct)
+
+	if stValue.Kind() != reflect.Ptr || stValue.Elem().Kind() != reflect.Struct {
+		return ErrNotAStructPointer
+	}
+
+	r.stValue = stValue.Elem()
+
 	nbFields := typeT.NumField()
 	for i := 0; i < nbFields; i++ {
 		var tagValue string
@@ -68,14 +76,6 @@ func (r *RegexToStruct) compile() error {
 			r.subexToField[reID] = i
 		}
 	}
-
-	stValue := reflect.ValueOf(r.Struct)
-
-	if stValue.Kind() != reflect.Ptr {
-		return ErrStructNotAPointer
-	}
-
-	r.stValue = stValue.Elem()
 
 	return nil
 }
@@ -96,8 +96,8 @@ func (e *FieldFillingError) Error() string {
 	return fmt.Sprintf("could not fill field %s: %s", e.FieldName, e.Err)
 }
 
-// ErrStructNotAPointer is an error that occurs when the struct is not a pointer
-var ErrStructNotAPointer = fmt.Errorf("struct is not a pointer")
+// ErrNotAStructPointer is an error that occurs when the struct is not a pointer
+var ErrNotAStructPointer = fmt.Errorf("not a struct pointer")
 
 // CompilationError is an error that occurs when compiling rules
 type CompilationError struct {

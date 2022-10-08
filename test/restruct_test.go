@@ -278,7 +278,23 @@ func TestNotAPointer(t *testing.T) {
 	}
 
 	_, err := rs.MatchString("anything")
-	a.ErrorIs(err, r.ErrStructNotAPointer)
+	a.ErrorIs(err, r.ErrNotAStructPointer)
+}
+
+func TestNotAStructPointer(t *testing.T) {
+	a := assert.New(t)
+
+	rs := &r.Restruct{
+		RegexToStructs: []*r.RegexToStruct{
+			{
+				Regex:  `(?P<a>\w+)`,
+				Struct: []string{},
+			},
+		},
+	}
+
+	_, err := rs.MatchString("anything")
+	a.ErrorIs(err, r.ErrNotAStructPointer)
 }
 
 func TestBadField(t *testing.T) {
