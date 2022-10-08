@@ -21,6 +21,7 @@ type RegexToStruct struct {
 	Struct        interface{}    // Struct instance to fill (can be shared between multiple RegexToStruct)
 	compiledRegex *regexp.Regexp // Compiled regex
 	subexToField  map[int]int    // Map of subexpression index to field index
+	stValue       reflect.Value  // Value of the struct
 }
 
 func (r *RegexToStruct) compile() error {
@@ -67,6 +68,14 @@ func (r *RegexToStruct) compile() error {
 			r.subexToField[reID] = i
 		}
 	}
+
+	stValue := reflect.ValueOf(r.Struct)
+
+	if stValue.Kind() != reflect.Ptr {
+		return ErrStructNotAPointer
+	}
+
+	r.stValue = stValue.Elem()
 
 	return nil
 }
@@ -151,13 +160,7 @@ func (r *RegexToStruct) fillStruct(s interface{}, match []string) (interface{}, 
 			continue
 		}
 
-		stValue := reflect.ValueOf(s)
-
-		if stValue.Kind() != reflect.Ptr {
-			return nil, ErrStructNotAPointer
-		}
-
-		stValue = stValue.Elem().Field(fieldIndex)
+		stValue := r.stValue.Field(fieldIndex)
 
 		if reValue == "" {
 			stValue.Set(reflect.Zero(stValue.Type()))
