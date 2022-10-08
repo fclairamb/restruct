@@ -2,12 +2,12 @@ goos: darwin
 goarch: arm64
 pkg: github.com/fclairamb/restruct/test
 BenchmarkSmallStruct
-BenchmarkSmallStruct-8    	 4355553	       270.0 ns/op	     112 B/op	       2 allocs/op
+BenchmarkSmallStruct-8    	 4320471	       268.7 ns/op	     112 B/op	       2 allocs/op
 BenchmarkLoadAndExec
-BenchmarkLoadAndExec-8    	  448663	      2672 ns/op	    4765 B/op	      40 allocs/op
+BenchmarkLoadAndExec-8    	  440768	      2766 ns/op	    4767 B/op	      40 allocs/op
 BenchmarkThreeRules
-BenchmarkThreeRules-8     	 2373064	       507.7 ns/op	     112 B/op	       2 allocs/op
+BenchmarkThreeRules-8     	 2315868	       515.6 ns/op	     112 B/op	       2 allocs/op
 BenchmarkBiggerStruct
-BenchmarkBiggerStruct-8   	 4302745	       269.9 ns/op	     112 B/op	       2 allocs/op
+BenchmarkBiggerStruct-8   	 4226725	       270.9 ns/op	     112 B/op	       2 allocs/op
 PASS
-ok  	github.com/fclairamb/restruct/test	5.942s
+ok  	github.com/fclairamb/restruct/test	5.941s

@@ -122,6 +122,11 @@ func (r *Restruct) compile() error {
 	return nil
 }
 
+// Compile validates the config
+func (r *Restruct) Compile() error {
+	return r.compile()
+}
+
 // MatchString will return a possible match with a filled struct
 func (r *Restruct) MatchString(s string) (*RegexToStruct, error) {
 	if !r.compiled {

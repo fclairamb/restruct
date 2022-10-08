@@ -250,6 +250,11 @@ func TestBadRegex(t *testing.T) {
 		},
 	}
 
+	{
+		errType := &r.CompilationError{}
+		a.ErrorAs(rs.Compile(), &errType)
+	}
+
 	m, err := rs.MatchString("anything")
 	a.Error(err)
 	a.ErrorContains(err, "could not compile rule: error parsing regexp:")
