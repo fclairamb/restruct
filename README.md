@@ -49,7 +49,7 @@ if m != nil {
 ```
 
 ## Benchmark
-It's definitely _not_ fast:
+It's _not_ fast:
 ```text
 go test -bench=. -benchmem
 goos: darwin

@@ -1,4 +1,5 @@
+__*
 *.pprof
+*.test
 coverage.txt
 .DS_Store
-*.test
