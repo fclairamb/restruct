@@ -23,6 +23,8 @@ type RegexToStruct struct {
 	subexToField  map[int]int    // Map of subexpression index to field index
 }
 
+var ErrStructNotPointer = fmt.Errorf("struct should be passed as a pointer")
+
 func (r *RegexToStruct) compile() error {
 	compiledRegex, err := regexp.Compile(r.Regex)
 	if err != nil {
@@ -148,7 +150,13 @@ func (r *RegexToStruct) fillStruct(s interface{}, match []string) (interface{}, 
 			continue
 		}
 
-		stValue := reflect.ValueOf(s).Elem().Field(fieldIndex)
+		stValue := reflect.ValueOf(s)
+
+		if stValue.Kind() != reflect.Ptr {
+			return nil, ErrStructNotPointer
+		}
+
+		stValue = stValue.Elem().Field(fieldIndex)
 
 		if reValue == "" {
 			stValue.Set(reflect.Zero(stValue.Type()))
