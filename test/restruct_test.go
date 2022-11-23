@@ -1,11 +1,56 @@
 package restruct_test
 
 import (
+	"fmt"
 	"testing"
 
 	r "github.com/fclairamb/restruct"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestReadmeSample(t *testing.T) {
+	type Human struct {
+		Name   string `restruct:"name"` // Specifying the field
+		Age    int    // No tag, "age" will be used
+		Height *int   // A pointer will be set to nil if the capture group is empty
+	}
+
+	rs := &r.Restruct{
+		RegexToStructs: []*r.RegexToStruct{
+			{
+				ID:     "age",
+				Regex:  `^(?P<name>\w+) is (?P<age>\d+)( years old)?$`,
+				Struct: &Human{},
+			},
+			{
+				ID:     "height",
+				Regex:  `^(?P<name>\w+) is (?P<height>\d+) cm tall$`,
+				Struct: &Human{},
+			},
+		},
+	}
+
+	for _, input := range []string{"John is 178 cm tall", "John is 42 years old"} {
+		m, _ := rs.MatchString(input)
+
+		if m == nil {
+			fmt.Printf(`No match for "%s"`, input)
+
+			continue
+		}
+
+		fmt.Println("Match ID:", m.ID)
+
+		h := m.Struct.(*Human)
+		fmt.Printf("name = %v, age = %v", h.Name, h.Age)
+
+		if h.Height != nil {
+			fmt.Printf(", height = %v", *h.Height)
+		}
+
+		fmt.Printf("\n")
+	}
+}
 
 func TestStandard(t *testing.T) {
 	a := assert.New(t)

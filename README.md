@@ -15,37 +15,71 @@ The struct shall have a field for each capture group of the regex.
 
 ## Usage
 
+This can be tested [on the playground](https://go.dev/play/p/beFzEua9vlE).
+
 ```golang
-import(
-    	r "github.com/fclairamb/restruct"
+package main
+
+import (
+	"fmt"
+
+	r "github.com/fclairamb/restruct"
 )
 
-type Human struct {
-    Name   string `restruct:"name"` // Specifying the field
-    Age    int  // No tag, "age" will be used
-    Height *int // A pointer will be set to nil if the capture group is empty
-}
+func main() {
 
-rs := &r.Restruct{
-    RegexToStructs: []*r.RegexToStruct{
-        {
-            ID:     "age",
-            Regex:  `^(?P<name>\w+) is ((?P<age>\d+)( years old)?$`,
-            Struct: &Human{},
-        },
-        {
-            ID:     "height",
-            Regex:  `^(?P<name>\w+) is (?P<height>\d+) cm tall$`,
-            Struct: &Human{},
-        },
-    },
-}
+	type Human struct {
+		Name   string `restruct:"name"` // Specifying the field
+		Age    int    // No tag, "age" will be used
+		Height *int   // A pointer will be set to nil if the capture group is empty
+	}
 
-m := rs.Match("John is 42 years old")
-if m != nil {
-    h := m.Struct.(*Human)
-    fmt.Printf("name = %s, age = %d", h.Name, h.Age)
+	rs := &r.Restruct{
+		RegexToStructs: []*r.RegexToStruct{
+			{
+				ID:     "age",
+				Regex:  `^(?P<name>\w+) is (?P<age>\d+)( years old)?$`,
+				Struct: &Human{},
+			},
+			{
+				ID:     "height",
+				Regex:  `^(?P<name>\w+) is (?P<height>\d+) cm tall$`,
+				Struct: &Human{},
+			},
+		},
+	}
+
+	for _, input := range []string{"John is 178 cm tall", "John is 42 years old"} {
+		fmt.Println("input:", input)
+		m, _ := rs.MatchString(input)
+
+		if m == nil {
+			fmt.Printf(`No match for "%s"`, input)
+
+			continue
+		}
+
+		fmt.Println("  match ID:", m.ID)
+
+		h := m.Struct.(*Human)
+		fmt.Printf("  name = %v, age = %v", h.Name, h.Age)
+
+		if h.Height != nil {
+			fmt.Printf(", height = %v", *h.Height)
+		}
+
+		fmt.Printf("\n")
+	}
 }
+```
+This will produce:
+```
+input: John is 178 cm tall
+  match ID: height
+  name = John, age = 0, height = 178
+input: John is 42 years old
+  match ID: age
+  name = John, age = 42
 ```
 
 ## Benchmark
