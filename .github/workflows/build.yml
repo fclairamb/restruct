@@ -11,13 +11,13 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        go: [ 1.19, 1.18 ]
+        go: [ '1.27', '1.26' ]
         include:
-          - go: 1.19
+          - go: '1.27'
             lint: true
   
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -25,18 +25,18 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
 
-      # Running golangci-lint
-      - name: Linting
-        if: matrix.lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: v1.64.8
-
       # Install Go
       - name: Setup go
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
+
+      # Running golangci-lint
+      - name: Linting
+        if: matrix.lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.14.0
 
       - name: Build
         run: go build -v ./...
@@ -46,13 +46,12 @@ jobs:
         # env:
         #   CGO_ENABLED: 0
         run: |
-          apt-get update && apt-get install gcc -y
           go test -parallel 20 -v -race -coverprofile=coverage.txt -covermode=atomic -coverpkg=./... ./...
           go test ./... -run=^$ -bench=. -benchmem
           bash <(curl -s https://codecov.io/bash)
   # For github to have a unique status check name
   build-status:
     needs: build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - run: echo 'All good'

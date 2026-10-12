@@ -1,81 +1,84 @@
+version: "2"
 run:
-  # timeout for analysis, e.g. 30s, 5m, default is 1m
-  deadline: 1m
-
-  # default concurrency is a available CPU number
   concurrency: 4
-
 linters:
-  disable-all: true
+  default: none
+  settings:
+    depguard:
+      rules:
+        main:
+          allow:
+            - $gostd
+            - github.com/fclairamb/restruct
+            - github.com/stretchr/testify
   enable:
     - asciicheck
     - bodyclose
-    - deadcode
     - depguard
     - dogsled
     - dupl
+    - err113
     - errcheck
     - exhaustive
-    # - exhaustivestruct
-    - exportloopref
     - funlen
-    - gci
-    - gochecknoinits
     - gochecknoglobals
+    - gochecknoinits
     - gocognit
     - goconst
     - gocritic
     - gocyclo
     - godox
-    - goerr113
-    - gofmt
-    - goimports
-    # - golint --> revive
-    - revive
-    - gomnd
     - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - ineffassign
-    # - interfacer --> (deprecated)
     - lll
-    # - maligned --> govet:fieldalignment
-    - megacheck
     - misspell
+    - mnd
     - nakedret
     - nestif
-    - nlreturn
-    - prealloc
     - nilerr
+    - nlreturn
     - nolintlint
+    - prealloc
+    - revive
     - rowserrcheck
-    # - scopelint --> exportloopref
-    - exportloopref
     - staticcheck
-    - structcheck
-    - stylecheck
     - testpackage
-    - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
     - wrapcheck
     - wsl
-  fast: false
-  misspell:
-    # Correct spellings using locale preferences for US or UK.
-    # Default is to use a neutral variety of English.
-    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
-    locale: US
-issues:
-  include:
-    - EXC0012 # EXC0012 revive: Annoying issue about not having a comment. The rare codebase has such comments
-    - EXC0014 # EXC0014 revive: Annoying issue about not having a comment. The rare codebase has such comments
-  exclude-rules:
-    - path: "_test\\.go"
-      linters:
-        - funlen
-        - gomnd
+  exclusions:
+    generated: lax
+    presets:
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - funlen
+          - goconst
+          - mnd
+        path: _test\.go
+      - linters:
+          - revive
+        path: _test\.go
+        text: unused-parameter
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
