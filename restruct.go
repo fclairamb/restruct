@@ -46,13 +46,13 @@ func (r *RegexToStruct) compile() error {
 
 	typeT := reflect.TypeOf(r.Struct)
 
-	if typeT.Kind() == reflect.Ptr {
+	if typeT.Kind() == reflect.Pointer {
 		typeT = typeT.Elem()
 	}
 
 	stValue := reflect.ValueOf(r.Struct)
 
-	if stValue.Kind() != reflect.Ptr || stValue.Elem().Kind() != reflect.Struct {
+	if stValue.Kind() != reflect.Pointer || stValue.Elem().Kind() != reflect.Struct {
 		return ErrNotAStructPointer
 	}
 
